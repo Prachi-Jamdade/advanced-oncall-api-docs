@@ -1,0 +1,203 @@
+openapi: 3.0.4
+info:
+  title: Shiftly API
+  version: "2.0"
+  description: API for creating and managing on-call schedules with timezone intelligence.
+
+paths:
+  /api/v2/schedules:
+    post:
+      summary: Create a new on-call schedule with timezone awareness
+      operationId: createSchedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleRequest'
+      responses:
+        '201':
+          description: Schedule created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleResponse'
+
+    get:
+      summary: List all schedules
+      operationId: listSchedules
+      responses:
+        '200':
+          description: A list of schedules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleResponse'
+
+  /api/v2/schedules/{schedule_id}:
+    get:
+      summary: Get a specific schedule by ID
+      operationId: getSchedule
+      parameters:
+        - name: schedule_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Schedule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleResponse'
+
+    put:
+      summary: Update a schedule
+      operationId: updateSchedule
+      parameters:
+        - name: schedule_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleRequest'
+      responses:
+        '200':
+          description: Schedule updated successfully
+
+    delete:
+      summary: Delete a schedule
+      operationId: deleteSchedule
+      parameters:
+        - name: schedule_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Schedule deleted successfully
+
+components:
+  schemas:
+    ScheduleRequest:
+      type: object
+      required:
+        - name
+        - timezone_aware
+        - rotation
+        - start_time
+      properties:
+        name:
+          type: string
+          example: Global SRE Schedule
+        timezone_aware:
+          type: boolean
+          example: true
+        start_time:
+          type: string
+          format: date-time
+          example: "2025-04-18T00:00:00Z"
+        rotation:
+          type: object
+          required:
+            - type
+            - participants
+          properties:
+            type:
+              type: string
+              enum: [daily, weekly, custom]
+              example: daily
+            participants:
+              type: array
+              items:
+                $ref: '#/components/schemas/Participant'
+        holiday_calendars:
+          type: array
+          description: Optional list of holiday calendar IDs to respect
+          items:
+            type: string
+          example: ["cal_us_public", "cal_india_festivals"]
+          # You can integrate public or custom calendars and skip scheduling on those days.
+        fallback_user_id:
+          type: string
+          description: Optional user ID to assign in case no participant is available
+          example: u_99999
+          # Useful when no participants are available or outside their working hours
+
+    Participant:
+      type: object
+      required:
+        - user_id
+        - timezone
+        - working_hours
+      properties:
+        user_id:
+          type: string
+          example: u_12345
+        timezone:
+          type: string
+          example: Asia/Kolkata
+        working_hours:
+          type: object
+          required:
+            - start
+            - end
+          properties:
+            start:
+              type: string
+              pattern: "^\\d{2}:\\d{2}$"
+              example: "09:00"
+            end:
+              type: string
+              pattern: "^\\d{2}:\\d{2}$"
+              example: "18:00"
+
+    ScheduleResponse:
+      type: object
+      properties:
+        schedule_id:
+          type: string
+          example: sch_45678
+        name:
+          type: string
+          example: Global SRE Schedule
+        status:
+          type: string
+          example: created
+        timezone_aware:
+          type: boolean
+        start_time:
+          type: string
+          format: date-time
+        rotation:
+          $ref: '#/components/schemas/RotationSummary'
+        fallback_user_id:
+          type: string
+        holiday_calendars:
+          type: array
+          items:
+            type: string
+
+    RotationSummary:
+      type: object
+      properties:
+        type:
+          type: string
+          example: daily
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Participant'
+            
+servers:
+  - url: https://mock.shiftly.dev
+    description: Mock server for testing
