@@ -199,5 +199,5 @@ components:
             $ref: '#/components/schemas/Participant'
             
 servers:
-  - url: https://mock.shiftly.dev
+  - url: https://mock.zenduty.dev
     description: Mock server for testing
