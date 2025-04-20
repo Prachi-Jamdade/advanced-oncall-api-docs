@@ -126,12 +126,10 @@ components:
           items:
             type: string
           example: ["cal_us_public", "cal_india_festivals"]
-          # You can integrate public or custom calendars and skip scheduling on those days.
         fallback_user_id:
           type: string
           description: Optional user ID to assign in case no participant is available
           example: u_99999
-          # Useful when no participants are available or outside their working hours
 
     Participant:
       type: object
