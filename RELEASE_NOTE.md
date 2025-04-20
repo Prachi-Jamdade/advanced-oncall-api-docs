@@ -49,7 +49,8 @@ You can interact with these features through the following endpoints:
 
    ![Delete Schedule](./assets/delete-schedule.png)
 
-
-You can find screenshots and request examples for each endpoint in the Postman documentation.
+You can import our Postman collection to start testing all endpoints. Each request comes with pre-filled example data and supports easy authentication setup.
 
 [Download Postman Collection](Zenduty-Advanced-On-Call-Scheduling-API.postman_collection.json)
+
+Need help? Join our [community](https://community.zenduty.com/) and let's chat!
